@@ -11,6 +11,12 @@ kubectl edit deployment my-release-metrics-server
 
 In that file go to 61st line and enter 
  - --kubelet-insecure-tls (add on 62nd line)
+ 
+      - name: metrics-server
+        image: k8s.gcr.io/metrics-server
+        command:
+        - /metrics-server
+        - --kubelet-insecure-tls
 
 your metrics-server Deployment should be modified like this:
 vi hpa.yaml
@@ -28,11 +34,6 @@ kubectl delete -f .
 kubectl get hpa
 
 
-      - name: metrics-server
-        image: k8s.gcr.io/metrics-server
-        command:
-        - /metrics-server
-        - --kubelet-insecure-tls
 #Master
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1/nodes"	
 		
