@@ -1,10 +1,10 @@
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-helm upgrade --namespace default my-release bitnami/metrics-server     --set apiService.create=true
 
 Install Helm
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install my-release bitnami/metrics-server
+helm upgrade --namespace default my-release bitnami/metrics-server     --set apiService.create=true
 
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1/nodes"
 kubectl edit deployment my-release-metrics-server
@@ -13,12 +13,26 @@ In that file go to 61st line and enter
  - --kubelet-insecure-tls (add on 62nd line)
 
 your metrics-server Deployment should be modified like this:
+vi hpa.yaml
+kubectl apply -f hpa.yaml
+kubectl get deployments -o wide
+kubectl get pods -o wide
+kubectl get services -o wide
+kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10
+kubectl describe hpa php-apache
+kubectl get pods -o wide
+kubectl delete pod load-generator
+watch kubectl describe hpa php-apache
+kubectl get pods -o wide
+
 
       - name: metrics-server
         image: k8s.gcr.io/metrics-server
         command:
         - /metrics-server
         - --kubelet-insecure-tls
+#Master
+kubectl get --raw "/apis/metrics.k8s.io/v1beta1/nodes"	
 		
 apiVersion: apps/v1
 kind: Deployment
