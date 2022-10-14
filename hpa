@@ -24,6 +24,8 @@ kubectl get pods -o wide
 kubectl delete pod load-generator
 watch kubectl describe hpa php-apache
 kubectl get pods -o wide
+kubectl delete -f .
+kubectl get hpa
 
 
       - name: metrics-server
