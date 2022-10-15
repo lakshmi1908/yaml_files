@@ -1,28 +1,40 @@
 def containerName="planview"
 def tag="latest"
-def dockerHubUser="anujsharma1990"
+def dockerHubUser="lakshmi1908"
 def httpPort="8090"
+
+
 
 node {
 
-    stage('Checkout') {
+
+
+   stage('Checkout') {
         git changelog: false, poll: false, url: 'https://github.com/anujdevopslearn/SpringBootDocker'
     }
 
-    stage('Build'){
+
+
+   stage('Build'){
         sh "mvn clean install"
     }
 
-    stage("Image Prune"){
+
+
+   stage("Image Prune"){
          sh "docker image prune -a -f"
     }
 
-    stage('Image Build'){
+
+
+   stage('Image Build'){
         sh "docker build -t $containerName:$tag  -t $containerName --pull --no-cache ."
         echo "Image build complete"
     }
 
-    stage('Push to Docker Registry'){
+
+
+   stage('Push to Docker Registry'){
         withCredentials([usernamePassword(credentialsId: 'dockerHubAccount', usernameVariable: 'dockerUser', passwordVariable: 'dockerPassword')]) {
             sh "docker login -u $dockerUser -p $dockerPassword"
             sh "docker tag $containerName:$tag $dockerUser/$containerName:$tag"
@@ -31,23 +43,14 @@ node {
         }
     }
 
-	
+
+
+   
     stage('Run App'){
         /*sh "docker rm $containerName -f"
         sh "docker pull $dockerHubUser/$containerName"
         sh "docker run -d --rm -p $httpPort:$httpPort --name $containerName $dockerHubUser/$containerName:$tag"
         echo "Application started on port: ${httpPort} (http)"
         */
-		withAWS(credentials: 'EKSCreds', region: 'us-east-2') {
-			sh "aws sts get-caller-identity"
-			sh "aws eks update-kubeconfig --region us-east-2 --name ec2-worker-cluster"
-			sh """
-			   kubectl get pods
-			   kubectl delete deployment kubernetes-bootcamp | true
-			   kubectl create deployment kubernetes-bootcamp --image=docker.io/anujsharma1990/$containerName:$tag --port=8090
-			   kubectl get pods
-			"""
-		}
+        }
     }
-
-}
