@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ais-ifm-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/subnets: subnet-0a347d2c563af102f, subnet-0741933301154d8ed
+spec:
+  rules:
+  - host: 
+    http:
+      paths:
+      - path: "/ais"
+        pathType: Prefix
+        backend:
+          service:
+            name: ais-service
+            port: 
+              number: 8090
+      - path: "/ifm"
+        pathType: Prefix
+        backend:
+          service:
+            name: ais-service
+            port: 
+              number: 80
